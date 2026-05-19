@@ -404,17 +404,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 CustomText.muted(currentMinSec, fontSize: 11),
                 Expanded(
-                  child: Slider(
-                    value: _position.inMilliseconds.toDouble(),
-                    max: _duration.inMilliseconds.toDouble() > 0
-                        ? _duration.inMilliseconds.toDouble()
-                        : 100.0,
-                    activeColor: AppColors.primary,
-                    inactiveColor: AppColors.border,
-                    onChanged: (val) {
-                      _audioPlayer?.seek(Duration(milliseconds: val.toInt()));
-                    },
-                  ),
+                  child: () {
+                    final double posMs = _position.inMilliseconds.toDouble();
+                    final double durMs = _duration.inMilliseconds.toDouble();
+                    final double maxMs = durMs > 0 ? durMs : (posMs > 100.0 ? posMs : 100.0);
+                    final double clampedValue = posMs.clamp(0.0, maxMs);
+                    return Slider(
+                      value: clampedValue,
+                      min: 0.0,
+                      max: maxMs,
+                      activeColor: AppColors.primary,
+                      inactiveColor: AppColors.border,
+                      onChanged: (val) {
+                        _audioPlayer?.seek(Duration(milliseconds: val.toInt()));
+                      },
+                    );
+                  }(),
                 ),
                 CustomText.muted(totalMinSec, fontSize: 11),
               ],
